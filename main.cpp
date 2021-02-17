@@ -50,8 +50,6 @@ int main(int argc, char **argv ) {
         }
     }
 
-    /*
-
     //Search data structure:
     //Set found condition to false
     //Create queue of pair<int cost, string destination>
@@ -87,6 +85,5 @@ int main(int argc, char **argv ) {
 
     cout << endl << "Minimum travel distance: " << travelDistance << endl;
 
-     */
     return 0;
 }
