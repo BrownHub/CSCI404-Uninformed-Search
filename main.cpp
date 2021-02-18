@@ -43,7 +43,7 @@ int main(int argc, char **argv ) {
     for (pair<string, map<string, int>> c : roadmap) {
         bool connected = false;
         for(set<string> Component : connections){
-            if(Component.count(c.first) > 1) {
+            if(Component.count(c.first) > 0) {
                 connected = true;
                 break;
             }
@@ -53,14 +53,12 @@ int main(int argc, char **argv ) {
             set<string> connectedComponent;
             getConnection(c.first, roadmap, connectedComponent);
 
-            if(connections.size() == 1){
-                connections.at(0) = connectedComponent;
-            } else {
-                connections.push_back(connectedComponent);
-            }
+            connections.push_back(connectedComponent);
         }
     }
+    connections.erase(connections.begin());
 
+    //Test that connections are working
     for(set<string> component : connections){
         cout << endl << "Connection:" << endl;
         for(string location : component){
@@ -68,6 +66,7 @@ int main(int argc, char **argv ) {
         }
     }
 
+    //Test that map is working
     for (pair<string, map <string, int>> c : roadmap){
         cout << c.first << endl;
 
@@ -80,32 +79,42 @@ int main(int argc, char **argv ) {
     //Set found condition to false
     //Create queue of pair<int cost, string destination>
     //Create distance variable
-    string startingCity = "Bremen";
+    string startingCity = "London";
     string destinationCity = "Frankfurt";
     int travelDistance = 0;
+    bool connected = false;
     bool found = false;
     priority_queue<pair<int, string>> searchQueue;
     searchQueue.push(pair<int, string> (travelDistance, startingCity)); //Start at city
 
-    while (!found) {
-        //expand next node in queue
-        pair<int, string> node = searchQueue.top();
-        searchQueue.pop();
-        node.first = node.first * -1;
-        cout << endl << node.first;
-
-        if(node.first >= maxDistance) {
+    for (set<string> component : connections) {
+        if(component.count(startingCity) > 0 && component.count(destinationCity) > 0){
+            connected = true;
             break;
         }
+    }
 
-        for(pair<string, int> c : roadmap.at(node.second)) {
-            //Check if any nodes are destination
-            if (c.first == destinationCity) {
-                found = true;
-                travelDistance = node.first + c.second;
+    if(connected) {
+        while (!found) {
+            //expand next node in queue
+            pair<int, string> node = searchQueue.top();
+            searchQueue.pop();
+            node.first = node.first * -1;
+            cout << endl << node.first; //Test distance
+
+            if (node.first >= maxDistance) {
                 break;
-            } else {    //Add to queue in priority order
-                searchQueue.push(pair<int, string> (((node.first + c.second) * -1), c.first));
+            }
+
+            for (pair<string, int> c : roadmap.at(node.second)) {
+                //Check if any nodes are destination
+                if (c.first == destinationCity) {
+                    found = true;
+                    travelDistance = node.first + c.second;
+                    break;
+                } else {    //Add to queue in priority order
+                    searchQueue.push(pair<int, string>(((node.first + c.second) * -1), c.first));
+                }
             }
         }
     }
