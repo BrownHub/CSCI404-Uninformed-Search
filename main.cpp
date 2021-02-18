@@ -3,8 +3,11 @@
 #include <map>
 #include <fstream>
 #include <queue>
+#include <set>
 
 using namespace std;
+
+void getConnection(string city, map<string, map<string, int>> &roadmap, set<string> &connectedComponent);
 
 int main(int argc, char **argv ) {
     string city;
@@ -21,8 +24,8 @@ int main(int argc, char **argv ) {
     //Construct data structure:
     // separate values into city, destination, and distance
     //Create map<string(city):map<string(dest):int(distance)>
-    //Initializes map with data from file
-    // Add distances for a max value
+    //Creates map with data from file
+    // Sum distances for a max value
     while (lineStart != "END"){
         city = lineStart;
         inputFile >> destination;
@@ -30,15 +33,38 @@ int main(int argc, char **argv ) {
         inputFile >> lineStart;
 
         roadmap[city][destination] = distance;
+        roadmap[destination][city] = distance;
         maxDistance += distance;
     }
 
-    //Completes map with two-way information
-    for (pair<string, map <string, int>> c1 : roadmap){
-        for (pair<string, map <string, int>> c2 : roadmap){
-            if(c2.second.count(c1.first) > 0){
-                roadmap[c1.first][c2.first] = c2.second.at(c1.first);
+    //Create a structure to track connected locations
+    vector<set<string>> connections(1);
+
+    for (pair<string, map<string, int>> c : roadmap) {
+        bool connected = false;
+        for(set<string> Component : connections){
+            if(Component.count(c.first) > 1) {
+                connected = true;
+                break;
             }
+        }
+
+        if(!connected){
+            set<string> connectedComponent;
+            getConnection(c.first, roadmap, connectedComponent);
+
+            if(connections.size() == 1){
+                connections.at(0) = connectedComponent;
+            } else {
+                connections.push_back(connectedComponent);
+            }
+        }
+    }
+
+    for(set<string> component : connections){
+        cout << endl << "Connection:" << endl;
+        for(string location : component){
+            cout << location << endl;
         }
     }
 
@@ -64,8 +90,9 @@ int main(int argc, char **argv ) {
     while (!found) {
         //expand next node in queue
         pair<int, string> node = searchQueue.top();
-        node.first = node.first * -1;
         searchQueue.pop();
+        node.first = node.first * -1;
+        cout << endl << node.first;
 
         if(node.first >= maxDistance) {
             break;
@@ -86,4 +113,16 @@ int main(int argc, char **argv ) {
     cout << endl << "Minimum travel distance: " << travelDistance << endl;
 
     return 0;
+}
+
+void getConnection(string city, map<string, map<string, int>> &roadmap, set<string> &connectedComponent){
+    if(connectedComponent.count(city) > 0) {
+        return;
+    }
+
+    connectedComponent.insert(city);
+
+    for(pair<string, int> c : roadmap.at(city)) {
+        getConnection(c.first, roadmap, connectedComponent);
+    }
 }
