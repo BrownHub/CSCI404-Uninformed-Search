@@ -18,7 +18,7 @@ int main(int argc, char **argv ) {
 
     //read in file
     string lineStart;
-    ifstream inputFile("input1.txt");
+    ifstream inputFile("Input2.txt");
     inputFile >> lineStart;
 
     //Construct data structure:
@@ -79,12 +79,13 @@ int main(int argc, char **argv ) {
     //Set found condition to false
     //Create queue of pair<int cost, string destination>
     //Create distance variable
-    string startingCity = "Bremen";
-    string destinationCity = "Frankfurt";
+    string startingCity = "Bar";
+    string destinationCity = "Bar";
     int travelDistance = 0;
     vector<string> travelPath;
     bool connected = false;
     bool found = false;
+    bool sameCity = false;
     priority_queue<pair<int, pair<string, vector<string>>>> searchQueue;
     pair<int, pair<string, vector<string>>> startingNode;
     startingNode.first = travelDistance;
@@ -105,9 +106,9 @@ int main(int argc, char **argv ) {
             pair<int, pair<string, vector<string>>> node = searchQueue.top();
             searchQueue.pop();
             node.first = node.first * -1;
-            cout << endl << node.first; //Test distance
 
-            if (node.first >= maxDistance) {
+            if(node.second.first == destinationCity) {
+                sameCity = true;
                 break;
             }
 
@@ -133,10 +134,21 @@ int main(int argc, char **argv ) {
         }
     }
 
-    cout << endl << "Minimum travel distance: " << travelDistance << endl;
-    cout << "Path:" << endl;
-    for (string city : travelPath){
-        cout << city << endl;
+    if(sameCity) {
+        cout << "distance: " << travelDistance << " km" << endl;
+        cout << "route:" << endl;
+        cout << destinationCity << " to " << destinationCity << ", " << travelDistance << " km" << endl;
+    } else if(!found) {
+        cout << "distance: infinity" << endl;
+        cout << "route:\nnone";
+    } else {
+        cout << "distance: " << travelDistance << " km" << endl;
+        cout << "route:" << endl;
+
+        for (int i = 0; i < travelPath.size() - 1; i++ ) {
+            cout << travelPath.at(i) << " to " << travelPath.at(i + 1) << ", ";
+            cout << roadmap.at(travelPath.at(i)).at(travelPath.at(i + 1)) << " km" << endl;
+        }
     }
 
     return 0;
