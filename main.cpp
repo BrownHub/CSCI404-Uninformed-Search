@@ -79,13 +79,18 @@ int main(int argc, char **argv ) {
     //Set found condition to false
     //Create queue of pair<int cost, string destination>
     //Create distance variable
-    string startingCity = "London";
+    string startingCity = "Bremen";
     string destinationCity = "Frankfurt";
     int travelDistance = 0;
+    vector<string> travelPath;
     bool connected = false;
     bool found = false;
-    priority_queue<pair<int, string>> searchQueue;
-    searchQueue.push(pair<int, string> (travelDistance, startingCity)); //Start at city
+    priority_queue<pair<int, pair<string, vector<string>>>> searchQueue;
+    pair<int, pair<string, vector<string>>> startingNode;
+    startingNode.first = travelDistance;
+    startingNode.second.first = startingCity;
+    startingNode.second.second.push_back(startingCity);
+    searchQueue.push(startingNode); //Start at city
 
     for (set<string> component : connections) {
         if(component.count(startingCity) > 0 && component.count(destinationCity) > 0){
@@ -97,7 +102,7 @@ int main(int argc, char **argv ) {
     if(connected) {
         while (!found) {
             //expand next node in queue
-            pair<int, string> node = searchQueue.top();
+            pair<int, pair<string, vector<string>>> node = searchQueue.top();
             searchQueue.pop();
             node.first = node.first * -1;
             cout << endl << node.first; //Test distance
@@ -106,20 +111,33 @@ int main(int argc, char **argv ) {
                 break;
             }
 
-            for (pair<string, int> c : roadmap.at(node.second)) {
+            for (pair<string, int> c : roadmap.at(node.second.first)) {
                 //Check if any nodes are destination
                 if (c.first == destinationCity) {
                     found = true;
                     travelDistance = node.first + c.second;
+                    vector<string> path = node.second.second;
+                    path.push_back(c.first);
+                    travelPath = path;
                     break;
                 } else {    //Add to queue in priority order
-                    searchQueue.push(pair<int, string>(((node.first + c.second) * -1), c.first));
+                    vector<string> path = node.second.second;
+                    path.push_back(c.first);
+                    pair<int, pair<string, vector<string>>> newNode;
+                    newNode.first = (node.first + c.second) * -1;
+                    newNode.second.first = c.first;
+                    newNode.second.second = path;
+                    searchQueue.push(newNode);
                 }
             }
         }
     }
 
     cout << endl << "Minimum travel distance: " << travelDistance << endl;
+    cout << "Path:" << endl;
+    for (string city : travelPath){
+        cout << city << endl;
+    }
 
     return 0;
 }
