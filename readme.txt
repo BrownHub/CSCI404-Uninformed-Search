@@ -1,5 +1,5 @@
 Kendall Brown CWID: 10864365
-Programmed in C++
+Programmed in C++ on Windows 10
 Compiled in linux on isengard
 
 Instructions:
