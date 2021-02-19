@@ -10,10 +10,10 @@ using namespace std;
 void getConnection(string city, map<string, map<string, int>> &roadmap, set<string> &connectedComponent);
 
 int main(int argc, char **argv ) {
+    //Initialize variables for creating map
     string city;
     string destination;
     int distance;
-    int maxDistance = 0;
     map<string, map<string, int>> roadmap;
 
     //read in file
@@ -34,12 +34,12 @@ int main(int argc, char **argv ) {
 
         roadmap[city][destination] = distance;
         roadmap[destination][city] = distance;
-        maxDistance += distance;
     }
 
     //Create a structure to track connected locations
     vector<set<string>> connections(1);
 
+    //track connected locations
     for (pair<string, map<string, int>> c : roadmap) {
         bool connected = false;
         for(set<string> Component : connections){
@@ -58,27 +58,7 @@ int main(int argc, char **argv ) {
     }
     connections.erase(connections.begin());
 
-    //Test that connections are working
-    for(set<string> component : connections){
-        cout << endl << "Connection:" << endl;
-        for(string location : component){
-            cout << location << endl;
-        }
-    }
-
-    //Test that map is working
-    for (pair<string, map <string, int>> c : roadmap){
-        cout << c.first << endl;
-
-        for (pair<string, int> d : c.second){
-            cout << "\t" << d.first << ": " << d.second << endl;
-        }
-    }
-
-    //Search data structure:
-    //Set found condition to false
-    //Create queue of pair<int cost, string destination>
-    //Create distance variable
+    //Create variables to search map
     string startingCity = argv[2];
     string destinationCity = argv[3];
     int travelDistance = 0;
@@ -93,6 +73,7 @@ int main(int argc, char **argv ) {
     startingNode.second.second.push_back(startingCity);
     searchQueue.push(startingNode); //Start at city
 
+    //Search map
     for (set<string> component : connections) {
         if(component.count(startingCity) > 0 && component.count(destinationCity) > 0){
             connected = true;
@@ -134,13 +115,14 @@ int main(int argc, char **argv ) {
         }
     }
 
+    //Print results to terminal
     if(sameCity) {
         cout << "distance: " << travelDistance << " km" << endl;
         cout << "route:" << endl;
         cout << destinationCity << " to " << destinationCity << ", " << travelDistance << " km" << endl;
     } else if(!found) {
         cout << "distance: infinity" << endl;
-        cout << "route:\nnone";
+        cout << "route:\nnone" << endl;
     } else {
         cout << "distance: " << travelDistance << " km" << endl;
         cout << "route:" << endl;
