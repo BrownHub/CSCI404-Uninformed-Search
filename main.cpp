@@ -18,7 +18,7 @@ int main(int argc, char **argv ) {
 
     //read in file
     string lineStart;
-    ifstream inputFile("Input2.txt");
+    ifstream inputFile(argv[1]);
     inputFile >> lineStart;
 
     //Construct data structure:
@@ -79,8 +79,8 @@ int main(int argc, char **argv ) {
     //Set found condition to false
     //Create queue of pair<int cost, string destination>
     //Create distance variable
-    string startingCity = "Bar";
-    string destinationCity = "Bar";
+    string startingCity = argv[2];
+    string destinationCity = argv[3];
     int travelDistance = 0;
     vector<string> travelPath;
     bool connected = false;
